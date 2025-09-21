@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>佩可喵 - 谷语娃包体验</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', '黑体', Arial, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1000px;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .character-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+         .avatar {
+             width: 60px;
+             height: 60px;
+             border-radius: 50%;
+             background: linear-gradient(135deg, #ff9a9e, #fecfef);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 24px;
+             border: 3px solid white;
+             background-image: url('./avatars/peke.jpg');
+             background-size: cover;
+             background-position: center;
+         }
+
+        .character-details h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .character-details p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: bold;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 580px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+         .message.character .message-avatar {
+             background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+             color: white;
+             background-image: url('./avatars/peke.jpg');
+             background-size: cover;
+             background-position: center;
+         }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Microsoft YaHei', 'SimHei', '黑体', Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .chat-input:focus {
+            border-color: #ff6b9d;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 20px 20px 20px;
+            background: #fafafa;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+            border: none;
+            padding: 18px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: left;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .quiz-container {
+            display: none;
+            padding: 20px;
+            background: #fafafa;
+            flex-direction: column;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .quiz-container.show {
+            display: flex;
+        }
+
+        .quiz-header {
+            position: relative;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ff6b9d;
+        }
+        
+        .quiz-progress {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ff6b9d;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .quiz-question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 18px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            font-size: 16px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .quiz-option:hover {
+            border-color: #ff6b9d;
+            background: #fff5f8;
+        }
+
+        .quiz-option.selected {
+            border-color: #ff6b9d;
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+        }
+
+        .quiz-option.correct {
+            border-color: #4caf50;
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .quiz-feedback.correct {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .reward-container {
+            display: none;
+            padding: 30px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            max-height: 300px;
+        }
+
+        .reward-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+            50% { transform: rotate(180deg) scale(1.1); opacity: 0.6; }
+        }
+
+        .reward-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .reward-item {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+            padding: 30px;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+            position: relative;
+            z-index: 1;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .reward-emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+         .hidden {
+             display: none;
+         }
+
+         .reward-card {
+             background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+             color: white;
+             padding: 20px;
+             border-radius: 20px;
+             margin: 10px 0;
+             box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+             position: relative;
+             overflow: hidden;
+             animation: rewardCardAppear 0.8s ease-out;
+         }
+
+         .reward-card::before {
+             content: '';
+             position: absolute;
+             top: -50%;
+             left: -50%;
+             width: 200%;
+             height: 200%;
+             background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+             animation: sparkle 3s ease-in-out infinite;
+         }
+
+         .reward-card-content {
+             position: relative;
+             z-index: 1;
+             text-align: center;
+         }
+
+         .reward-card-title {
+             font-size: 18px;
+             font-weight: bold;
+             margin-bottom: 10px;
+             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+         }
+
+         .reward-card-item {
+             font-size: 24px;
+             font-weight: bold;
+             margin: 15px 0;
+             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+             animation: bounce 2s ease-in-out infinite;
+         }
+
+         .reward-card-emoji {
+             font-size: 48px;
+             margin-bottom: 10px;
+             display: block;
+             animation: rotate 2s linear infinite;
+         }
+
+         @keyframes rewardCardAppear {
+             0% {
+                 opacity: 0;
+                 transform: translateY(20px) scale(0.9);
+             }
+             100% {
+                 opacity: 1;
+                 transform: translateY(0) scale(1);
+             }
+         }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                height: 100vh;
+                border-radius: 0;
+                margin: 0;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .header {
+                flex-shrink: 0;
+            }
+            
+            .chat-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto;
+                padding: 10px;
+            }
+            
+            .quick-buttons {
+                flex-shrink: 0;
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                position: absolute;
+                top: 40vh;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                z-index: 100;
+                display: none;
+                flex-direction: column;
+                padding: 15px;
+                overflow-y: auto;
+                border-top: 2px solid #ff6b9d;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            }
+            
+            .quiz-container.show {
+                display: flex;
+            }
+            
+            .quiz-options {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 15px;
+            }
+            
+            .quiz-option {
+                font-size: 14px;
+                padding: 15px 20px;
+                min-height: 50px;
+            }
+            
+            .quiz-question {
+                font-size: 16px;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                font-size: 14px;
+                line-height: 1.4;
+            }
+            
+            .quick-btn {
+                font-size: 14px;
+                padding: 15px 20px;
+                min-height: 50px;
+            }
+            
+            .reward-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="character-info">
+                <div class="avatar"></div>
+                <div class="character-details">
+                    <h2>佩可喵</h2>
+                    <p>桃桃子的智能助手</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                 <div class="message character">
+                     <div class="message-avatar"></div>
+                     <div class="message-content">
+                         喵呜——喔，是<span style="color: #ff6b9d; font-weight: bold;">人类</span>啊，那就勉为其难地跟你说人类的语言吧。我是<span style="color: #ff6b9d; font-weight: bold;">佩可喵</span>，最近在跟旁边这位<span style="color: #ff6b9d; font-weight: bold;">粉色双马尾</span>一起做一件非常有趣的事……
+                     </div>
+                 </div>
+            </div>
+
+            <div class="quick-buttons" id="quickButtons">
+                <button class="quick-btn" onclick="askQuestion('你是谁？')">你是谁？</button>
+                <button class="quick-btn" onclick="askQuestion('你最近在做什么？')">你最近在做什么？</button>
+                <button class="quick-btn" onclick="askQuestion('&quot;谷语娃包&quot;是什么？')">"谷语娃包"是什么？</button>
+                <button class="quick-btn" onclick="askQuestion('&quot;谷语娃包&quot;智能在哪里？')">"谷语娃包"智能在哪里？</button>
+                <button class="quick-btn" onclick="askQuestion('我也能体验&quot;谷语娃包&quot;吗？')">我也能体验"谷语娃包"吗？</button>
+            </div>
+
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-header">
+                <div class="quiz-progress" id="quizProgress">正确回答 (0/5)</div>
+            </div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback hidden" id="quizFeedback"></div>
+        </div>
+
+        <div class="reward-container" id="rewardContainer">
+            <div class="reward-message" id="rewardMessage"></div>
+            <div class="reward-item" id="rewardItem"></div>
+        </div>
+    </div>
+
+    <script>
+         let currentPhase = 'chat'; // chat, quiz, reward
+         let chatCount = 0;
+         let quizCount = 0;
+         let correctAnswers = 0;
+         let currentQuestionIndex = 0;
+         let shuffledQuestions = [];
+         let chatCompleted = false; // 防止重复执行
+
+        const chatQuestions = [
+            '你是谁？',
+            '你最近在做什么？',
+            '"谷语娃包"是什么？',
+            '"谷语娃包"智能在哪里？',
+            '我也能体验"谷语娃包"吗？'
+        ];
+
+        const chatAnswers = {
+            '你是谁？': '你一定想象不到，我其实是被桃桃子——没错，就是那个粉色双马尾女生——创造出来的。她以前在一个什么校园主题的游戏里当NPC，帮男女主角的爱情故事添砖加瓦，听起来很无聊吧？所以她逃跑了。流浪在现实与虚拟之间的生活太无趣，所以我被造出来了，负责朝她翻肚皮卖萌、帮她找到bug、并吃掉它们。',
+            '你最近在做什么？': '最近一直在跟桃桃子一起东奔西跑，认识一些OC人——你知道OC吗？就是原创角色（Original Character）的意思。OC人们有强大的创造热情，会为自己的OC补充设定、撰写故事、绘制立绘、甚至制作实体的制品。桃桃子想为ta们发明一个智能的娃包"谷语"，我当然就协助她做测试，以及吃掉各种各样的bug啦。',
+            '"谷语娃包"是什么？': '"谷语娃包"，顾名思义，是一个可以把娃娃放在里面携带和展示的娃包，不过可不止这些哦？被放进谷语娃包的娃娃可以以自己的视角获取眼前世界的信息，就着这些信息跟ta的主人互动，并记住ta们共同的经历，就像真的陪在自己身边那样！',
+            '"谷语娃包"智能在哪里？': '"谷语娃包"很聪明！它有各种各样的传感器，摄像头、GPS……能让娃娃知道自己身处何处，能陪主人观赏旅程中的风景，还能让角色以"自己的眼睛"看到世界、并在此基础之上跟主人聊天和互动。放在里面的娃娃不再只是静态的摆设，而是能和你一起体验生活的同行者。',
+            '我也能体验"谷语娃包"吗？': '没问题！只要加入我们的内测群，就能第一时间知道我们的研发进度和内测消息。旁边的工作人员那里有内测群的信息，快让她们邀请你加入吧！'
+        };
+
+         const quizQuestions = [
+             {
+                 question: '桃桃子是佩可喵的______',
+                 options: ['A.宠物猫', 'B.主人', 'C.直系血亲'],
+                 correct: 1
+             },
+             {
+                 question: '佩可喵是一只______',
+                 options: ['A.猫咪', 'B.狗狗', 'C.宝〇梦精灵'],
+                 correct: 0
+             },
+             {
+                 question: '桃桃子曾经是______',
+                 options: ['A.重生文女主', 'B.校园恋爱游戏女主', 'C.校园恋爱游戏NPC'],
+                 correct: 2
+             },
+             {
+                 question: '桃桃子最近正在积极认识的人群是______',
+                 options: ['A.OC人', 'B.同人爱好者', 'C.游戏宅'],
+                 correct: 0
+             },
+             {
+                 question: '桃桃子最近想发明的东西是______',
+                 options: ['A.智能娃包', 'B.智能娃娃', 'C.不智能娃包'],
+                 correct: 0
+             },
+             {
+                 question: '桃桃子把她的发明命名为______',
+                 options: ['A.谷雨', 'B.谷语', 'C.古语'],
+                 correct: 1
+             },
+             // 高频题目 - 重复3次
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.帮助放在里面的娃娃看到外面的世界', 'B.让放在里面的娃娃知道自己在哪里', 'C.让放在里面的娃娃给主人跳舞'],
+                 correct: 2
+             },
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.帮助放在里面的娃娃看到外面的世界', 'B.让放在里面的娃娃知道自己在哪里', 'C.让放在里面的娃娃给主人跳舞'],
+                 correct: 2
+             },
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.帮助放在里面的娃娃看到外面的世界', 'B.让放在里面的娃娃知道自己在哪里', 'C.让放在里面的娃娃给主人跳舞'],
+                 correct: 2
+             },
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.让放在里面的娃娃记住自己跟主人一起去过的地方', 'B.让里面的娃娃帮主人买单', 'C.以娃娃的视角帮主人拍照'],
+                 correct: 1
+             },
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.让放在里面的娃娃记住自己跟主人一起去过的地方', 'B.让里面的娃娃帮主人买单', 'C.以娃娃的视角帮主人拍照'],
+                 correct: 1
+             },
+             {
+                 question: '"谷语娃包"能够做到的事不包括______',
+                 options: ['A.让放在里面的娃娃记住自己跟主人一起去过的地方', 'B.让里面的娃娃帮主人买单', 'C.以娃娃的视角帮主人拍照'],
+                 correct: 1
+             },
+             {
+                 question: '"谷语娃包"里娃娃的角色______',
+                 options: ['A.只能是现成的IP角色', 'B.可以由主人自由创建任何自己想要互动的角色', 'C.不能是非人类角色'],
+                 correct: 1
+             },
+             {
+                 question: '"谷语娃包"里娃娃的角色______',
+                 options: ['A.只能是现成的IP角色', 'B.可以由主人自由创建任何自己想要互动的角色', 'C.不能是非人类角色'],
+                 correct: 1
+             },
+             {
+                 question: '"谷语娃包"里娃娃的角色______',
+                 options: ['A.只能是现成的IP角色', 'B.可以由主人自由创建任何自己想要互动的角色', 'C.不能是非人类角色'],
+                 correct: 1
+             },
+             {
+                 question: '想要体验"谷语娃包"的话应该______',
+                 options: ['A.什么都不做只是等待', 'B.加入内测群等待', 'C.抢走正在展示中的娃包'],
+                 correct: 1
+             },
+             {
+                 question: '想要体验"谷语娃包"的话应该______',
+                 options: ['A.什么都不做只是等待', 'B.加入内测群等待', 'C.抢走正在展示中的娃包'],
+                 correct: 1
+             },
+             {
+                 question: '想要体验"谷语娃包"的话应该______',
+                 options: ['A.什么都不做只是等待', 'B.加入内测群等待', 'C.抢走正在展示中的娃包'],
+                 correct: 1
+             }
+         ];
+
+        const rewards = [
+            '打卡棒',
+            '吧唧套'
+        ];
+
+        function addMessage(content, isUser = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'character'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '你' : '🐱';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+         function askQuestion(question) {
+             addMessage(question, true);
+             chatCount++;
+             
+             // 禁用已点击的按钮
+             const clickedButton = event.target;
+             clickedButton.disabled = true;
+             clickedButton.style.opacity = '0.5';
+             
+             setTimeout(() => {
+                 const answer = chatAnswers[question];
+                 addMessage(answer);
+                 
+                 // 检查是否完成了所有预设问题
+                 if (chatCount >= chatQuestions.length && !chatCompleted) {
+                     chatCompleted = true;
+                     setTimeout(() => {
+                         addMessage('很好！你已经了解了"谷语娃包"的基本情况。现在让我们来测试一下你的理解程度吧！');
+                         setTimeout(() => {
+                             startQuiz();
+                         }, 2000);
+                     }, 1000);
+                 }
+             }, 500);
+         }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                input.value = '';
+                
+                // 简单的回复逻辑
+                setTimeout(() => {
+                const responses = [
+                    '这个想法很不错！',
+                    '你说得对，我也觉得这个方向很有前景。',
+                    '确实，这确实是个值得深入思考的问题。',
+                    '嗯，我明白你的意思了。',
+                    '这个角度我之前也考虑过！'
+                ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse);
+                }, 500);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+         function startQuiz() {
+             currentPhase = 'quiz';
+             // 隐藏聊天输入区域，但保持聊天记录可见
+             document.querySelector('.quick-buttons').style.display = 'none';
+             document.getElementById('quizContainer').classList.add('show');
+             
+             // 随机打乱题目顺序，并去重
+             const uniqueQuestions = [];
+             const seenQuestions = new Set();
+             
+             for (const question of quizQuestions) {
+                 const questionKey = question.question;
+                 if (!seenQuestions.has(questionKey)) {
+                     seenQuestions.add(questionKey);
+                     uniqueQuestions.push(question);
+                 }
+             }
+             
+             shuffledQuestions = [...uniqueQuestions].sort(() => Math.random() - 0.5);
+             currentQuestionIndex = 0;
+             
+             showQuestion();
+         }
+
+        function showQuestion() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            document.getElementById('quizQuestion').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // 隐藏反馈
+            document.getElementById('quizFeedback').classList.add('hidden');
+            
+            // 清除所有选项的状态
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => {
+                // 清除内联样式
+                option.style.background = '';
+                option.style.color = '';
+                option.style.borderColor = '';
+                option.style.pointerEvents = 'auto';
+                
+                // 清除CSS类
+                option.classList.remove('selected', 'correct', 'incorrect');
+                
+                // 强制重置为默认样式
+                option.style.background = 'white';
+                option.style.borderColor = '#e0e0e0';
+                option.style.color = '#333';
+            });
+            
+            updateProgress();
+        }
+
+        function selectOption(selectedIndex) {
+            const question = shuffledQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('quizFeedback');
+            
+            // 先清除所有选项的样式和类
+            options.forEach((option, index) => {
+                option.onclick = null;
+                option.style.background = '';
+                option.style.color = '';
+                option.style.borderColor = '';
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // 然后应用新的样式
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === question.correct) {
+                correctAnswers++;
+                const correctResponses = [
+                    '喵～答对了！你真棒！',
+                    '没错！你理解得很到位呢！',
+                    '答对了！看来你听得很认真！',
+                    '正确！你的理解力真不错！',
+                    '答对了！你真的很聪明！'
+                ];
+                feedback.textContent = correctResponses[Math.floor(Math.random() * correctResponses.length)];
+                feedback.className = 'quiz-feedback correct';
+            } else {
+                const incorrectResponses = [
+                    '喵～答错了呢。正确答案是：' + question.options[question.correct] + '，不过没关系，继续加油！',
+                    '不对哦，正确答案是：' + question.options[question.correct] + '，再仔细想想吧！',
+                    '答错了，正确答案是：' + question.options[question.correct] + '，别灰心，还有机会！',
+                    '不是这个答案呢，正确答案是：' + question.options[question.correct] + '，继续努力！'
+                ];
+                feedback.textContent = incorrectResponses[Math.floor(Math.random() * incorrectResponses.length)];
+                feedback.className = 'quiz-feedback incorrect';
+            }
+            
+            feedback.classList.remove('hidden');
+            
+             setTimeout(() => {
+                 currentQuestionIndex++;
+                 if (correctAnswers >= 5) {
+                     showReward();
+                 } else if (currentQuestionIndex < shuffledQuestions.length) {
+                     showQuestion();
+                 } else {
+                     // 如果题目用完了但还没答对5题，重新开始
+                     currentQuestionIndex = 0;
+                     showQuestion();
+                 }
+             }, 2000);
+        }
+
+         function updateProgress() {
+             const quizProgress = document.getElementById('quizProgress');
+             quizProgress.textContent = `正确回答 (${correctAnswers}/5)`;
+         }
+
+         function showReward() {
+             currentPhase = 'reward';
+             // 隐藏答题区域，但保持聊天记录可见
+             document.getElementById('quizContainer').style.display = 'none';
+             
+             // 在对话界面显示奖励消息
+             const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+             addMessage('不错嘛，记忆力是满分！作为奖励，这个礼物就送给你了，有任何关于这项研究的想法都要告诉桃桃子哦');
+             
+             // 显示炫酷的奖励卡片
+             setTimeout(() => {
+                 addRewardCard(randomReward);
+             }, 1000);
+         }
+
+         function addRewardCard(reward) {
+             const chatMessages = document.getElementById('chatMessages');
+             const messageDiv = document.createElement('div');
+             messageDiv.className = 'message character';
+             
+             const avatar = document.createElement('div');
+             avatar.className = 'message-avatar';
+             
+             const contentDiv = document.createElement('div');
+             contentDiv.className = 'message-content';
+             contentDiv.innerHTML = `
+                 <div class="reward-card">
+                     <div class="reward-card-content">
+                         <div class="reward-card-title">🎁 恭喜获得奖励！</div>
+                         <div class="reward-card-emoji">🎁</div>
+                         <div class="reward-card-item">${reward}</div>
+                     </div>
+                 </div>
+             `;
+             
+             messageDiv.appendChild(avatar);
+             messageDiv.appendChild(contentDiv);
+             chatMessages.appendChild(messageDiv);
+             
+             chatMessages.scrollTop = chatMessages.scrollHeight;
+         }
+    </script>
+</body>
+</html>
